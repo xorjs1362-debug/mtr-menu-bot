@@ -30,7 +30,7 @@ jobs:
 
       - name: Install OCR and browser dependencies
         run: |
-          set -o pipefail
+          set +e
           {
             echo '=== install start ==='
             sudo apt-get update
@@ -39,14 +39,18 @@ jobs:
             pip install -r requirements.txt
             python -m playwright install --with-deps chromium
             echo '=== install complete ==='
-          } 2>&1 | tee install.log
+          } > install.log 2>&1
+          code=$?
+          echo "install_exit_code=$code" >> install.log
+          cat install.log
+          exit 0
 
       - name: Fetch latest Kakao menu and OCR
         run: |
           set +e
           python scripts/fetch_menu.py > run.log 2>&1
           code=$?
-          echo "exit_code=$code" >> run.log
+          echo "run_exit_code=$code" >> run.log
           cat run.log
           exit 0
 
