@@ -1,0 +1,20 @@
+metadata_status=200
+metadata_image_url=http://k.kakaocdn.net/dn/myU6p/dJMcaafffOt/DAD6TkQ44Ie6GrKg1thVkK/img_l.jpg
+image_status=200
+image_content_type=image/jpeg
+image_bytes=110109
+pil_size=952x691
+best_psm=4
+hangul_chars=54
+
+=== OCR ===
+< 2026년 8월 7일 >
+육볶음  * 열무국수
+* 함박스테이크        * 샐러드
+* OSES 0]          * 라면
+* 콩나물무침           * 계란 후라이
+* 고추장멸치볶음  ＊ 원두커피
+* 쯤상추겉절이
+* 유부된장     * 식혜
+
+exit_code=0
