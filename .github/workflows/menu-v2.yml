@@ -39,12 +39,11 @@ jobs:
           python -m pip install --upgrade pip >> install-v2.log 2>&1
           pip install --prefer-binary -r requirements.txt >> install-v2.log 2>&1
           echo "install_exit_code=0" >> install-v2.log
-          tail -n 30 install-v2.log
 
       - name: Fetch and OCR
         run: |
           set +e
-          python scripts/fetch_menu_vertical.py > run-v2.log 2>&1
+          python scripts/fetch_menu_vertical_v3.py > run-v2.log 2>&1
           code=$?
           echo "exit_code=$code" >> run-v2.log
           cat run-v2.log
