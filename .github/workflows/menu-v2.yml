@@ -1,6 +1,8 @@
 name: Cafeteria menu OCR v2
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '55 1 * * 1-5'
