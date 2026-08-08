@@ -1,17 +1,19 @@
 name: Cafeteria menu OCR v2
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '55 1 * * 1-5'
+  issues:
+    types: [opened]
 
 permissions:
-  contents: write
+  contents: read
+  issues: write
 
 jobs:
   menu:
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN MENU BOT'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -23,10 +25,14 @@ jobs:
 
       - name: Install runtime
         run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          set +e
+          sudo apt-get update > install-v2.log 2>&1
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor >> install-v2.log 2>&1
+          python -m pip install --upgrade pip >> install-v2.log 2>&1
+          pip install -r requirements.txt >> install-v2.log 2>&1
+          echo "install_exit_code=$?" >> install-v2.log
+          cat install-v2.log
+          exit 0
 
       - name: Fetch and OCR
         run: |
@@ -36,13 +42,42 @@ jobs:
           cat run-v2.log
           exit 0
 
-      - name: Save result
+      - name: Publish result to output issue
         if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "mtr-menu-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add run-v2.log latest_menu.json latest_menu.txt data/latest_menu.png 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "Update cafeteria menu OCR result v2"
-            git push
-          fi
+          {
+            echo "## Cafeteria menu bot output"
+            echo
+            echo "- workflow_time_utc: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+            echo "- event: $GITHUB_EVENT_NAME"
+            echo
+            if [ -f latest_menu.txt ]; then
+              echo '```text'
+              cat latest_menu.txt
+              echo '```'
+            else
+              echo "### Pipeline result not created"
+              echo '```text'
+              cat run-v2.log 2>/dev/null || true
+              echo '```'
+            fi
+            echo
+            echo "### Install log tail"
+            echo '```text'
+            tail -n 40 install-v2.log 2>/dev/null || true
+            echo '```'
+            echo
+            echo "### Run log tail"
+            echo '```text'
+            tail -n 80 run-v2.log 2>/dev/null || true
+            echo '```'
+          } > issue-body.md
+          gh issue edit 1 --repo "$GITHUB_REPOSITORY" --body-file issue-body.md
+
+      - name: Close trigger issue
+        if: always() && github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --comment "Menu bot run finished. See issue #1 for the result." || true
