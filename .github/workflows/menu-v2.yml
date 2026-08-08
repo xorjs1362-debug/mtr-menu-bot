@@ -44,7 +44,7 @@ jobs:
       - name: Fetch and OCR
         run: |
           set +e
-          python scripts/fetch_menu.py > run-v2.log 2>&1
+          python scripts/fetch_menu_vertical.py > run-v2.log 2>&1
           code=$?
           echo "exit_code=$code" >> run-v2.log
           cat run-v2.log
@@ -71,12 +71,7 @@ jobs:
             echo
             echo "### Run log tail"
             echo '```text'
-            tail -n 100 run-v2.log 2>/dev/null || true
-            echo '```'
-            echo
-            echo "### Install log tail"
-            echo '```text'
-            tail -n 30 install-v2.log 2>/dev/null || true
+            tail -n 120 run-v2.log 2>/dev/null || true
             echo '```'
           } > issue-body.md
           gh issue edit 1 --repo "$GITHUB_REPOSITORY" --body-file issue-body.md
