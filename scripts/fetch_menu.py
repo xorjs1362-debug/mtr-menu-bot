@@ -1,4 +1,5 @@
 # mtr-menu-bot: scheduled Kakao cafeteria menu OCR
+# diagnostic trigger
 import json
 import os
 import re
