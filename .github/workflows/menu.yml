@@ -1,0 +1,52 @@
+name: Fetch cafeteria menu
+
+on:
+  schedule:
+    # 10:55 KST (UTC+9), Monday-Friday
+    - cron: '55 1 * * 1-5'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'requirements.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install OCR and browser dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Fetch latest Kakao menu and OCR
+        run: python scripts/fetch_menu.py
+
+      - name: Commit result files
+        run: |
+          git config user.name "mtr-menu-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No result changes to commit"
+          else
+            git commit -m "Update cafeteria menu OCR"
+            git push
+          fi
