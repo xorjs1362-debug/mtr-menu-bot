@@ -1,3 +1,4 @@
+# diagnostic rerun 2026-08-09
 import json
 import re
 from pathlib import Path
@@ -17,7 +18,6 @@ OUT = ROOT / "diagnostic_result.txt"
 headers = {"User-Agent": "Mozilla/5.0"}
 logs = []
 
-# 1) JSON metadata endpoint
 image_url = None
 try:
     r = requests.get("https://api.microlink.io/", params={"url": POST_URL}, headers=headers, timeout=60)
@@ -28,7 +28,6 @@ try:
 except Exception as e:
     logs.append(f"metadata_error={type(e).__name__}: {e}")
 
-# 2) Download image URL if metadata returned one
 if image_url:
     try:
         ir = requests.get(image_url, headers=headers, timeout=60, allow_redirects=True)
@@ -40,7 +39,6 @@ if image_url:
     except Exception as e:
         logs.append(f"image_error={type(e).__name__}: {e}")
 
-# 3) Same embed URL that displayed correctly in Gmail
 if not IMG.exists() or IMG.stat().st_size < 10000:
     try:
         embed = f"https://api.microlink.io/?url={quote(POST_URL, safe='')}&embed=image.url"
