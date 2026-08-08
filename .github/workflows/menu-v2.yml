@@ -36,14 +36,6 @@ jobs:
           cat install-v2.log
           exit 0
 
-      - name: Discover Kakao feed API
-        run: |
-          set +e
-          python scripts/discover_kakao_api.py > discover-v2.log 2>&1
-          echo "discover_exit_code=$?" >> discover-v2.log
-          cat discover-v2.log
-          exit 0
-
       - name: Fetch and OCR
         run: |
           set +e
@@ -69,19 +61,22 @@ jobs:
               echo '```'
             fi
             echo
-            echo "### Kakao API discovery"
+            echo "### OCR candidates"
             echo '```text'
-            tail -n 180 discover-v2.log 2>/dev/null || true
+            if [ -f latest_menu.json ]; then
+              python - <<'PY'
+import json
+p=json.load(open('latest_menu.json',encoding='utf-8'))
+for i,c in enumerate(p.get('ocr_candidates',[])[:5],1):
+    print(f'--- candidate {i} | variant={c.get("variant")} psm={c.get("psm")} score={c.get("score")} ---')
+    print(c.get('text',''))
+PY
+            fi
             echo '```'
             echo
             echo "### Run log tail"
             echo '```text'
-            tail -n 100 run-v2.log 2>/dev/null || true
-            echo '```'
-            echo
-            echo "### Install log tail"
-            echo '```text'
-            tail -n 20 install-v2.log 2>/dev/null || true
+            tail -n 80 run-v2.log 2>/dev/null || true
             echo '```'
           } > issue-body.md
           gh issue edit 1 --repo "$GITHUB_REPOSITORY" --body-file issue-body.md
