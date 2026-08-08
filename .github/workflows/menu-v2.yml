@@ -36,6 +36,14 @@ jobs:
           cat install-v2.log
           exit 0
 
+      - name: Discover Kakao feed API
+        run: |
+          set +e
+          python scripts/discover_kakao_api.py > discover-v2.log 2>&1
+          echo "discover_exit_code=$?" >> discover-v2.log
+          cat discover-v2.log
+          exit 0
+
       - name: Fetch and OCR
         run: |
           set +e
@@ -59,21 +67,21 @@ jobs:
               echo '```text'
               cat latest_menu.txt
               echo '```'
-            else
-              echo "### Pipeline result not created"
-              echo '```text'
-              cat run-v2.log 2>/dev/null || true
-              echo '```'
             fi
             echo
-            echo "### Install log tail"
+            echo "### Kakao API discovery"
             echo '```text'
-            tail -n 40 install-v2.log 2>/dev/null || true
+            tail -n 180 discover-v2.log 2>/dev/null || true
             echo '```'
             echo
             echo "### Run log tail"
             echo '```text'
-            tail -n 80 run-v2.log 2>/dev/null || true
+            tail -n 100 run-v2.log 2>/dev/null || true
+            echo '```'
+            echo
+            echo "### Install log tail"
+            echo '```text'
+            tail -n 20 install-v2.log 2>/dev/null || true
             echo '```'
           } > issue-body.md
           gh issue edit 1 --repo "$GITHUB_REPOSITORY" --body-file issue-body.md
