@@ -9,6 +9,7 @@ on:
     paths:
       - 'scripts/**'
       - 'requirements.txt'
+      - '.github/workflows/menu.yml'
 
 permissions:
   contents: write
@@ -16,34 +17,42 @@ permissions:
 jobs:
   fetch-menu:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install OCR runtime
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install OCR and browser dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor python3-pip
-          python3 -m pip install requests==2.32.3 Pillow==11.3.0 pytesseract==0.3.13
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
 
-      - name: Run direct Microlink OCR diagnostic
+      - name: Run full menu pipeline
         run: |
           set +e
-          python3 scripts/diagnostic_ocr.py > diagnostic_run.log 2>&1
-          echo "exit_code=$?" >> diagnostic_run.log
-          cat diagnostic_run.log
+          python scripts/fetch_menu.py > run.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> run.log
+          cat run.log
           exit 0
 
-      - name: Commit diagnostic result
+      - name: Commit result and diagnostic files
         if: always()
         run: |
           git config user.name "mtr-menu-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add diagnostic_run.log diagnostic_result.txt data/diagnostic_menu.png 2>/dev/null || true
+          git add run.log latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No diagnostic changes"
+            echo "No result changes"
           else
-            git commit -m "Update direct OCR diagnostic"
+            git commit -m "Update cafeteria menu pipeline result"
             git push
           fi
