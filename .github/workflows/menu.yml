@@ -30,23 +30,34 @@ jobs:
 
       - name: Install OCR and browser dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          python -m playwright install --with-deps chromium
+          set -o pipefail
+          {
+            echo '=== install start ==='
+            sudo apt-get update
+            sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            python -m playwright install --with-deps chromium
+            echo '=== install complete ==='
+          } 2>&1 | tee install.log
 
       - name: Fetch latest Kakao menu and OCR
-        run: python scripts/fetch_menu.py
+        run: |
+          set +e
+          python scripts/fetch_menu.py > run.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> run.log
+          cat run.log
+          exit 0
 
-      - name: Commit result files
+      - name: Commit result and diagnostic files
         run: |
           git config user.name "mtr-menu-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
+          git add run.log install.log latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No result changes to commit"
           else
-            git commit -m "Update cafeteria menu OCR"
+            git commit -m "Update cafeteria menu diagnostics"
             git push
           fi
