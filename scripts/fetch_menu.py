@@ -1,5 +1,5 @@
 # mtr-menu-bot: scheduled Kakao cafeteria menu OCR
-# diagnostic trigger
+# full pipeline trigger 2026-08-09
 import json
 import os
 import re
