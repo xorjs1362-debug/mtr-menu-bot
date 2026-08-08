@@ -52,6 +52,24 @@ def collect_post_ids(value, path=()):
     return found
 
 
+def collect_large_scalars(value, path=()):
+    rows = []
+    if isinstance(value, dict):
+        for k, v in value.items():
+            rows.extend(collect_large_scalars(v, path + (str(k),)))
+    elif isinstance(value, list):
+        for i, v in enumerate(value):
+            rows.extend(collect_large_scalars(v, path + (f"[{i}]",)))
+    elif isinstance(value, int) and value > 1_000_000:
+        rows.append(("/".join(path), value))
+    elif isinstance(value, str):
+        if value.isdigit() and int(value) > 1_000_000:
+            rows.append(("/".join(path), value))
+        elif "pf.kakao.com" in value or "kakaocdn" in value:
+            rows.append(("/".join(path), value[:300]))
+    return rows
+
+
 def discover_latest_post():
     headers = {"User-Agent": UA, "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8"}
     errors = []
@@ -60,6 +78,16 @@ def discover_latest_post():
         r = requests.get(PROFILE_API, headers=headers, timeout=30)
         r.raise_for_status()
         payload = r.json()
+        print(f"PROFILE_API status={r.status_code} content_type={r.headers.get('content-type')}")
+        print("PROFILE_API top_keys=" + ",".join(payload.keys()) if isinstance(payload, dict) else f"PROFILE_API type={type(payload).__name__}")
+        rows = collect_large_scalars(payload)
+        print("PROFILE_API candidate scalars:")
+        for p, v in rows[:120]:
+            print(f"  {p} = {v}")
+        print("PROFILE_API pretty snippet:")
+        pretty = json.dumps(payload, ensure_ascii=False, indent=2)
+        print(pretty[:12000])
+
         ids = collect_post_ids(payload)
         ids |= {int(x) for x in re.findall(rf"/{re.escape(CHANNEL_ID)}/(\d+)", r.text)}
         if ids:
@@ -72,6 +100,9 @@ def discover_latest_post():
     try:
         r = requests.get(CHANNEL_URL + "/posts", headers=headers, timeout=30)
         r.raise_for_status()
+        print(f"POSTS_HTML status={r.status_code} content_type={r.headers.get('content-type')}")
+        print("POSTS_HTML snippet:")
+        print(r.text[:12000])
         ids = {int(x) for x in re.findall(rf"/{re.escape(CHANNEL_ID)}/(\d+)", r.text)}
         if ids:
             post_id = max(ids)
@@ -85,7 +116,6 @@ def discover_latest_post():
 
 def download_image(post_url):
     headers = {"User-Agent": UA}
-    image_url = None
     errors = []
 
     try:
@@ -135,12 +165,10 @@ def make_variants(path):
     if img.width < 1800:
         scale = max(2, int(1800 / max(img.width, 1)))
         img = img.resize((img.width * scale, img.height * scale), Image.Resampling.LANCZOS)
-
     gray = ImageOps.grayscale(img)
     gray = ImageOps.autocontrast(gray)
     gray = ImageEnhance.Contrast(gray).enhance(1.35)
     gray = gray.filter(ImageFilter.SHARPEN)
-
     strong = ImageEnhance.Contrast(gray).enhance(1.7)
     binary = strong.point(lambda p: 255 if p > 170 else 0)
     return [("gray", gray), ("strong", strong), ("binary", binary)]
@@ -155,14 +183,7 @@ def ocr_candidates(path):
             hangul = len(re.findall(r"[가-힣]", cleaned))
             date_bonus = 50 if re.search(r"20\d{2}\s*년\s*\d{1,2}\s*월\s*\d{1,2}\s*일", cleaned) else 0
             menu_markers = cleaned.count("*") + cleaned.count("•")
-            score = hangul * 3 + date_bonus + menu_markers * 2
-            attempts.append({
-                "variant": variant_name,
-                "psm": psm,
-                "score": score,
-                "hangul_chars": hangul,
-                "text": cleaned,
-            })
+            attempts.append({"variant": variant_name,"psm": psm,"score": hangul * 3 + date_bonus + menu_markers * 2,"hangul_chars": hangul,"text": cleaned})
     attempts.sort(key=lambda x: x["score"], reverse=True)
     return attempts[:5]
 
@@ -181,54 +202,28 @@ def extract_menu_date(candidates):
 
 def write_output(payload):
     OUT_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    lines = [
-        f"status: {payload['status']}",
-        f"date: {payload.get('date') or ''}",
-        f"checked_at: {payload['checked_at']}",
-        f"post_url: {payload.get('post_url') or ''}",
-        f"discovery: {payload.get('discovery') or ''}",
-        f"image_method: {payload.get('image_method') or ''}",
-        "",
-        "OCR BEST:",
-        payload.get("ocr_text") or "(empty)",
-        "",
-    ]
+    lines = [f"status: {payload['status']}",f"date: {payload.get('date') or ''}",f"checked_at: {payload['checked_at']}",f"post_url: {payload.get('post_url') or ''}",f"discovery: {payload.get('discovery') or ''}",f"image_method: {payload.get('image_method') or ''}","","OCR BEST:",payload.get("ocr_text") or "(empty)",""]
     OUT_TXT.write_text("\n".join(lines), encoding="utf-8")
 
 
 def main():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     checked_at = now_kst()
-    payload = {
-        "status": "error",
-        "date": None,
-        "checked_at": checked_at.isoformat(timespec="seconds"),
-        "post_url": None,
-        "discovery": None,
-        "image_source": None,
-        "image_method": None,
-        "ocr_text": "",
-        "ocr_candidates": [],
-        "error": None,
-    }
-
+    payload = {"status":"error","date":None,"checked_at":checked_at.isoformat(timespec="seconds"),"post_url":None,"discovery":None,"image_source":None,"image_method":None,"ocr_text":"","ocr_candidates":[],"error":None}
     try:
         post_url, discovery = discover_latest_post()
         payload["post_url"] = post_url
         payload["discovery"] = discovery
         print(f"Latest post: {post_url} via {discovery}")
-
         image_source, image_method = download_image(post_url)
         payload["image_source"] = image_source
         payload["image_method"] = image_method
         print(f"Image: {image_source} via {image_method}")
-
         candidates = ocr_candidates(IMAGE_FILE)
         payload["ocr_candidates"] = candidates
         payload["ocr_text"] = candidates[0]["text"] if candidates else ""
         menu_date = extract_menu_date(candidates)
         payload["date"] = menu_date.isoformat() if menu_date else None
-
         if not candidates or candidates[0]["hangul_chars"] < 8 or menu_date is None:
             payload["status"] = "ocr_failed"
         elif menu_date != checked_at.date():
@@ -238,7 +233,6 @@ def main():
     except Exception as e:
         payload["error"] = f"{type(e).__name__}: {e}"
         print(payload["error"])
-
     write_output(payload)
     print(OUT_TXT.read_text(encoding="utf-8"))
     return 0
