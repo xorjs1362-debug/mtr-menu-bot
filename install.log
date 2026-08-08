@@ -1,0 +1,142 @@
+Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+Get:6 https://packages.microsoft.com/repos/azure-cli noble InRelease [3564 B]
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:8 https://dl.google.com/linux/chrome-stable/deb stable InRelease [2548 B]
+Get:9 https://packages.microsoft.com/repos/azure-cli noble/main amd64 Packages [2375 B]
+Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [643 B]
+Get:11 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [274 kB]
+Get:12 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [314 kB]
+Get:13 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.2 kB]
+Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1184 kB]
+Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [281 kB]
+Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [180 kB]
+Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1682 kB]
+Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [335 kB]
+Get:19 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+Get:20 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1414 kB]
+Get:21 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [320 kB]
+Get:22 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [45.4 kB]
+Get:23 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse Translation-en [12.3 kB]
+Get:24 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+Get:25 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5764 B]
+Get:26 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [31.0 kB]
+Get:27 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]
+Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [927 kB]
+Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [201 kB]
+Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.4 kB]
+Get:31 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1199 kB]
+Get:32 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [239 kB]
+Get:33 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+Get:34 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1320 kB]
+Get:35 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [302 kB]
+Get:36 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [40.3 kB]
+Get:37 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse Translation-en [10.6 kB]
+Get:38 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1408 B]
+Fetched 11.2 MB in 1s (8593 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  libgif7 liblept5 libtesseract5 tesseract-ocr-eng tesseract-ocr-osd
+The following NEW packages will be installed:
+  libgif7 liblept5 libtesseract5 tesseract-ocr tesseract-ocr-eng
+  tesseract-ocr-kor tesseract-ocr-osd
+0 upgraded, 7 newly installed, 0 to remove and 86 not upgraded.
+Need to get 9499 kB of archives.
+After this operation, 23.6 MB of additional disk space will be used.
+Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgif7 amd64 5.2.2-1ubuntu1.2 [35.6 kB]
+Get:3 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 liblept5 amd64 1.82.0-3build4 [1099 kB]
+Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libtesseract5 amd64 5.3.4-1build5 [1291 kB]
+Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 tesseract-ocr-eng all 1:4.1.0-2 [1818 kB]
+Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 tesseract-ocr-osd all 1:4.1.0-2 [3841 kB]
+Get:7 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 tesseract-ocr amd64 5.3.4-1build5 [328 kB]
+Get:8 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 tesseract-ocr-kor all 1:4.1.0-2 [1086 kB]
+Fetched 9499 kB in 1s (7717 kB/s)
+Selecting previously unselected package libgif7:amd64.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 202954 files and directories currently installed.)
+Preparing to unpack .../0-libgif7_5.2.2-1ubuntu1.2_amd64.deb ...
+Unpacking libgif7:amd64 (5.2.2-1ubuntu1.2) ...
+Selecting previously unselected package liblept5:amd64.
+Preparing to unpack .../1-liblept5_1.82.0-3build4_amd64.deb ...
+Unpacking liblept5:amd64 (1.82.0-3build4) ...
+Selecting previously unselected package libtesseract5:amd64.
+Preparing to unpack .../2-libtesseract5_5.3.4-1build5_amd64.deb ...
+Unpacking libtesseract5:amd64 (5.3.4-1build5) ...
+Selecting previously unselected package tesseract-ocr-eng.
+Preparing to unpack .../3-tesseract-ocr-eng_1%3a4.1.0-2_all.deb ...
+Unpacking tesseract-ocr-eng (1:4.1.0-2) ...
+Selecting previously unselected package tesseract-ocr-osd.
+Preparing to unpack .../4-tesseract-ocr-osd_1%3a4.1.0-2_all.deb ...
+Unpacking tesseract-ocr-osd (1:4.1.0-2) ...
+Selecting previously unselected package tesseract-ocr.
+Preparing to unpack .../5-tesseract-ocr_5.3.4-1build5_amd64.deb ...
+Unpacking tesseract-ocr (5.3.4-1build5) ...
+Selecting previously unselected package tesseract-ocr-kor.
+Preparing to unpack .../6-tesseract-ocr-kor_1%3a4.1.0-2_all.deb ...
+Unpacking tesseract-ocr-kor (1:4.1.0-2) ...
+Setting up tesseract-ocr-kor (1:4.1.0-2) ...
+Setting up tesseract-ocr-eng (1:4.1.0-2) ...
+Setting up libgif7:amd64 (5.2.2-1ubuntu1.2) ...
+Setting up tesseract-ocr-osd (1:4.1.0-2) ...
+Setting up liblept5:amd64 (1.82.0-3build4) ...
+Setting up libtesseract5:amd64 (5.3.4-1build5) ...
+Setting up tesseract-ocr (5.3.4-1build5) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+Not building database; man-db/auto-update is not 'true'.
+Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages (26.1.2)
+Collecting pip
+  Downloading pip-26.2.1-py3-none-any.whl.metadata (4.6 kB)
+Downloading pip-26.2.1-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 17.6 MB/s  0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 26.1.2
+    Uninstalling pip-26.1.2:
+      Successfully uninstalled pip-26.1.2
+Successfully installed pip-26.2.1
+Collecting requests==2.32.3 (from -r requirements.txt (line 1))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting Pillow==11.3.0 (from -r requirements.txt (line 2))
+  Downloading pillow-11.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.0 kB)
+Collecting pytesseract==0.3.13 (from -r requirements.txt (line 3))
+  Downloading pytesseract-0.3.13-py3-none-any.whl.metadata (11 kB)
+Collecting charset-normalizer<4,>=2 (from requests==2.32.3->-r requirements.txt (line 1))
+  Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (41 kB)
+Collecting idna<4,>=2.5 (from requests==2.32.3->-r requirements.txt (line 1))
+  Downloading idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+Collecting urllib3<3,>=1.21.1 (from requests==2.32.3->-r requirements.txt (line 1))
+  Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+Collecting certifi>=2017.4.17 (from requests==2.32.3->-r requirements.txt (line 1))
+  Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting packaging>=21.3 (from pytesseract==0.3.13->-r requirements.txt (line 3))
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading pillow-11.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 115.3 MB/s  0:00:00
+Downloading pytesseract-0.3.13-py3-none-any.whl (14 kB)
+Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (224 kB)
+Downloading idna-3.18-py3-none-any.whl (65 kB)
+Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Installing collected packages: urllib3, Pillow, packaging, idna, charset-normalizer, certifi, requests, pytesseract
+
+Successfully installed Pillow-11.3.0 certifi-2026.7.22 charset-normalizer-3.4.9 idna-3.18 packaging-26.3 pytesseract-0.3.13 requests-2.32.3 urllib3-2.7.0
+install_exit_code=0

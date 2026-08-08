@@ -1,0 +1,48 @@
+{
+  "status": "stale",
+  "date": "2026-08-07",
+  "checked_at": "2026-08-09T02:41:48+09:00",
+  "post_url": "https://pf.kakao.com/_QpxgJn/114201684",
+  "discovery": "https://pf.kakao.com/rocket-web/web/profiles/_QpxgJn/posts",
+  "image_source": "http://k.kakaocdn.net/dn/myU6p/dJMcaafffOt/DAD6TkQ44Ie6GrKg1thVkK/img_l.jpg",
+  "image_method": "microlink_metadata",
+  "ocr_text": "< 2026년 8월 7일 >\n* 김치제육볶음 * 열무국수\n* 함박스테이크 * 샐러드\n* OSES 0] * 라면\n* 콩나물무침 * 계란 후라이\n* 고주장멸치볶음 ＊원두커피\n* ZIRE]\n* 포기김치 * 매실차\n* 유부된장국 * 식혜",
+  "ocr_candidates": [
+    {
+      "variant": "strong",
+      "psm": 6,
+      "score": 255,
+      "hangul_chars": 59,
+      "text": "< 2026년 8월 7일 >\n* 김치제육볶음 * 열무국수\n* 함박스테이크 * 샐러드\n* OSES 0] * 라면\n* 콩나물무침 * 계란 후라이\n* 고주장멸치볶음 ＊원두커피\n* ZIRE]\n* 포기김치 * 매실차\n* 유부된장국 * 식혜"
+    },
+    {
+      "variant": "strong",
+      "psm": 4,
+      "score": 222,
+      "hangul_chars": 64,
+      "text": "< 2026년 82 7일 >\n* 김치제육볶음 * 열무국수\n* 함박스테이크 * 샐러드\n* OUTS O] * 라면\n* 콩나물무침 * 계란 후라이\n* 고추장멸치볶음 * 원두커피\n* 쯤상추겉절이\n* 포기김치 * 매실차\n* 유부된장국 * 식혜"
+    },
+    {
+      "variant": "strong",
+      "psm": 11,
+      "score": 222,
+      "hangul_chars": 48,
+      "text": "< 2026년 8월 7일 >\n* 김치제\njo\n*x Ao\naT 3 T\n+ 함박스테이크\n* 샐러드\n* OUI O\n* 라면\n* 콩나물무침\n* 계란 후라이\n* 교\nHART\n치볶음\n* 원두커피\n* EYSAAO!\n* 포기김치\n* 매실차\n* 으브되자\nTt Two\n* 식혜"
+    },
+    {
+      "variant": "gray",
+      "psm": 6,
+      "score": 210,
+      "hangul_chars": 46,
+      "text": "< 2026년 8월 7일 >\n* 열무국수\n* 함박스테이크 * 샐러드\n* OWS] * 라면\n* 콩나물무침 * 계란 후라이\n* 고추장멸치볶음 + 원두커피\n* SUSUAO\n* 유부된장국 * 식혜"
+    },
+    {
+      "variant": "binary",
+      "psm": 6,
+      "score": 210,
+      "hangul_chars": 46,
+      "text": "< 2026년 8월 7일 >\n0 * 열무국수\n* 함박스테이크 = *샐러드\n* OTN 0) * 라면\n* 콩나물무침 * 계란 후라이\n* 고추장멸치볶음 + 원두커피\n* ZNAZAO]\n* 유부된장국 * 식혜"
+    }
+  ],
+  "error": null
+}
