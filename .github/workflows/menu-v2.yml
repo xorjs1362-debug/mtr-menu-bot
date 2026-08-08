@@ -17,30 +17,36 @@ jobs:
   menu:
     if: github.event_name != 'issues' || github.event.issue.title == 'RUN MENU BOT'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: pip
+
+      - name: Cache EasyOCR Korean model
+        uses: actions/cache@v4
+        with:
+          path: .easyocr-models
+          key: easyocr-ko-en-v1
 
       - name: Install runtime
         run: |
-          set +e
           sudo apt-get update > install-v2.log 2>&1
           sudo apt-get install -y tesseract-ocr tesseract-ocr-kor >> install-v2.log 2>&1
           python -m pip install --upgrade pip >> install-v2.log 2>&1
-          pip install -r requirements.txt >> install-v2.log 2>&1
-          echo "install_exit_code=$?" >> install-v2.log
-          cat install-v2.log
-          exit 0
+          pip install --prefer-binary -r requirements.txt >> install-v2.log 2>&1
+          echo "install_exit_code=0" >> install-v2.log
+          tail -n 30 install-v2.log
 
       - name: Fetch and OCR
         run: |
           set +e
           python scripts/fetch_menu.py > run-v2.log 2>&1
-          echo "exit_code=$?" >> run-v2.log
+          code=$?
+          echo "exit_code=$code" >> run-v2.log
           cat run-v2.log
           exit 0
 
@@ -59,24 +65,18 @@ jobs:
               echo '```text'
               cat latest_menu.txt
               echo '```'
+            else
+              echo "### Menu result was not created"
             fi
-            echo
-            echo "### OCR candidates"
-            echo '```text'
-            if [ -f latest_menu.json ]; then
-              python - <<'PY'
-import json
-p=json.load(open('latest_menu.json',encoding='utf-8'))
-for i,c in enumerate(p.get('ocr_candidates',[])[:5],1):
-    print(f'--- candidate {i} | variant={c.get("variant")} psm={c.get("psm")} score={c.get("score")} ---')
-    print(c.get('text',''))
-PY
-            fi
-            echo '```'
             echo
             echo "### Run log tail"
             echo '```text'
-            tail -n 80 run-v2.log 2>/dev/null || true
+            tail -n 100 run-v2.log 2>/dev/null || true
+            echo '```'
+            echo
+            echo "### Install log tail"
+            echo '```text'
+            tail -n 30 install-v2.log 2>/dev/null || true
             echo '```'
           } > issue-body.md
           gh issue edit 1 --repo "$GITHUB_REPOSITORY" --body-file issue-body.md
