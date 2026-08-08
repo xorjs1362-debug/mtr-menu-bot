@@ -57,7 +57,6 @@ def discover_latest_post():
     headers = {"User-Agent": UA, "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8"}
     candidates = []
 
-    # Fast path: static HTML/embedded state.
     try:
         r = requests.get(CHANNEL_URL, headers=headers, timeout=25)
         r.raise_for_status()
@@ -69,7 +68,6 @@ def discover_latest_post():
     if urls:
         return urls[0]
 
-    # Dynamic fallback: real browser.
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(user_agent=UA, locale="ko-KR", viewport={"width": 1280, "height": 1800})
@@ -109,7 +107,6 @@ def download_image_via_microlink(post_url):
     except Exception as e:
         print(f"Microlink JSON image fetch failed: {e}")
 
-    # The same endpoint that rendered successfully in Gmail.
     embed_url = f"https://api.microlink.io/?url={quote(post_url, safe='')}&embed=image.url"
     try:
         img = requests.get(embed_url, headers=headers, timeout=90, allow_redirects=True)
@@ -152,7 +149,6 @@ def capture_image_via_browser(post_url):
             browser.close()
             return info.get("src") or post_url
 
-        # Last resort: full post screenshot. OCR can still often recover menu text.
         page.screenshot(path=str(IMAGE_FILE), full_page=True)
         browser.close()
         return post_url
@@ -160,7 +156,6 @@ def capture_image_via_browser(post_url):
 
 def preprocess(path):
     img = Image.open(path).convert("RGB")
-    # Upscale small menu images to improve Korean OCR.
     if img.width < 1800:
         scale = max(2, int(1800 / max(img.width, 1)))
         img = img.resize((img.width * scale, img.height * scale), Image.Resampling.LANCZOS)
@@ -178,7 +173,6 @@ def clean_ocr(text):
         line = re.sub(r"\s+", " ", raw).strip(" |·•-_=~")
         if len(line) < 2:
             continue
-        # Remove obvious navigation / channel boilerplate if browser screenshot was used.
         if any(x in line for x in ["카카오톡채널", "채널 홈", "소식", "정보", "친구", "공유"]):
             continue
         if line not in seen:
@@ -232,7 +226,7 @@ def main():
     print(f"Latest post: {latest}")
     print(f"Last processed: {state.get('last_post_url')}")
 
-    if latest == state.get("last_post_url"):
+    if latest == state.get("last_post_url") and OUT_JSON.exists():
         print("No new post. Nothing to update.")
         return 0
 
