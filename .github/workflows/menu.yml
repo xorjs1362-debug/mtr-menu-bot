@@ -2,7 +2,6 @@ name: Fetch cafeteria menu
 
 on:
   schedule:
-    # 10:55 KST (UTC+9), Monday-Friday
     - cron: '55 1 * * 1-5'
   workflow_dispatch:
   push:
@@ -17,71 +16,34 @@ permissions:
 jobs:
   fetch-menu:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Record runner info
-        if: always()
+      - name: Install OCR runtime
         run: |
-          {
-            echo "date=$(date -u '+%F %T UTC')"
-            uname -a
-            which python3 || true
-            python3 --version || true
-            which pip3 || true
-          } > runner.log 2>&1
-          cat runner.log
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor python3-pip
+          python3 -m pip install requests==2.32.3 Pillow==11.3.0 pytesseract==0.3.13
 
-      - name: Set up Python
-        id: setup_python
-        continue-on-error: true
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install OCR and browser dependencies
-        if: always()
+      - name: Run direct Microlink OCR diagnostic
         run: |
           set +e
-          {
-            echo '=== install start ==='
-            python --version || python3 --version
-            sudo apt-get update
-            echo "apt_update_exit=$?"
-            sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
-            echo "tesseract_install_exit=$?"
-            python -m pip install --upgrade pip || python3 -m pip install --upgrade pip
-            echo "pip_upgrade_exit=$?"
-            python -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt
-            echo "requirements_exit=$?"
-            python -m playwright install --with-deps chromium || python3 -m playwright install --with-deps chromium
-            echo "playwright_install_exit=$?"
-            echo '=== install complete ==='
-          } > install.log 2>&1
-          cat install.log
+          python3 scripts/diagnostic_ocr.py > diagnostic_run.log 2>&1
+          echo "exit_code=$?" >> diagnostic_run.log
+          cat diagnostic_run.log
           exit 0
 
-      - name: Fetch latest Kakao menu and OCR
-        if: always()
-        run: |
-          set +e
-          (python scripts/fetch_menu.py || python3 scripts/fetch_menu.py) > run.log 2>&1
-          code=$?
-          echo "run_exit_code=$code" >> run.log
-          cat run.log
-          exit 0
-
-      - name: Commit result and diagnostic files
+      - name: Commit diagnostic result
         if: always()
         run: |
           git config user.name "mtr-menu-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add runner.log run.log install.log latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
+          git add diagnostic_run.log diagnostic_result.txt data/diagnostic_menu.png 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No result changes to commit"
+            echo "No diagnostic changes"
           else
-            git commit -m "Update cafeteria menu diagnostics"
+            git commit -m "Update direct OCR diagnostic"
             git push
           fi
