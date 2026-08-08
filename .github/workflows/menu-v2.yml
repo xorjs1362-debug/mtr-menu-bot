@@ -1,0 +1,48 @@
+name: Cafeteria menu OCR v2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '55 1 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Fetch and OCR
+        run: |
+          set +e
+          python scripts/fetch_menu.py > run-v2.log 2>&1
+          echo "exit_code=$?" >> run-v2.log
+          cat run-v2.log
+          exit 0
+
+      - name: Save result
+        if: always()
+        run: |
+          git config user.name "mtr-menu-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add run-v2.log latest_menu.json latest_menu.txt data/latest_menu.png 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Update cafeteria menu OCR result v2"
+            git push
+          fi
