@@ -22,43 +22,63 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Record runner info
+        if: always()
+        run: |
+          {
+            echo "date=$(date -u '+%F %T UTC')"
+            uname -a
+            which python3 || true
+            python3 --version || true
+            which pip3 || true
+          } > runner.log 2>&1
+          cat runner.log
+
       - name: Set up Python
+        id: setup_python
+        continue-on-error: true
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: pip
 
       - name: Install OCR and browser dependencies
+        if: always()
         run: |
           set +e
           {
             echo '=== install start ==='
+            python --version || python3 --version
             sudo apt-get update
+            echo "apt_update_exit=$?"
             sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-            python -m playwright install --with-deps chromium
+            echo "tesseract_install_exit=$?"
+            python -m pip install --upgrade pip || python3 -m pip install --upgrade pip
+            echo "pip_upgrade_exit=$?"
+            python -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt
+            echo "requirements_exit=$?"
+            python -m playwright install --with-deps chromium || python3 -m playwright install --with-deps chromium
+            echo "playwright_install_exit=$?"
             echo '=== install complete ==='
           } > install.log 2>&1
-          code=$?
-          echo "install_exit_code=$code" >> install.log
           cat install.log
           exit 0
 
       - name: Fetch latest Kakao menu and OCR
+        if: always()
         run: |
           set +e
-          python scripts/fetch_menu.py > run.log 2>&1
+          (python scripts/fetch_menu.py || python3 scripts/fetch_menu.py) > run.log 2>&1
           code=$?
           echo "run_exit_code=$code" >> run.log
           cat run.log
           exit 0
 
       - name: Commit result and diagnostic files
+        if: always()
         run: |
           git config user.name "mtr-menu-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add run.log install.log latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
+          git add runner.log run.log install.log latest_menu.json latest_menu.txt data/state.json data/latest_menu.png 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No result changes to commit"
           else
