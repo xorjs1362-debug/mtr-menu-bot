@@ -1,5 +1,6 @@
 (() => {
   const SORT_KEY = 'todo:lastSort';
+  let drag = null;
 
   function ensureManualSortOption() {
     const sort = $('#sort');
@@ -34,19 +35,24 @@
     return previousFiltered();
   };
 
-  function addMoveControls() {
-    const rows = [...document.querySelectorAll('#taskBody tr[data-id]')];
-    rows.forEach((row, index) => {
-      const cell = row.lastElementChild;
-      if (!cell || cell.querySelector('.order-controls')) return;
+  function makeHandle() {
+    const handle = document.createElement('span');
+    handle.className = 'task-drag-handle';
+    handle.textContent = '↕';
+    handle.title = '잡고 끌어서 할 일 순서 변경';
+    handle.setAttribute('role', 'button');
+    handle.setAttribute('aria-label', '할 일 순서 변경');
+    handle.setAttribute('tabindex', '0');
+    return handle;
+  }
 
-      const controls = document.createElement('span');
-      controls.className = 'order-controls';
-      controls.innerHTML = `
-        <button type="button" class="move-up" title="위로 이동" aria-label="위로 이동" ${index === 0 ? 'disabled' : ''}>↑</button>
-        <button type="button" class="move-down" title="아래로 이동" aria-label="아래로 이동" ${index === rows.length - 1 ? 'disabled' : ''}>↓</button>
-      `;
-      cell.insertBefore(controls, cell.firstChild);
+  function addDragHandles() {
+    document.querySelectorAll('#taskBody tr[data-id]').forEach(row => {
+      if (row.querySelector('.task-drag-handle')) return;
+      const cell = row.lastElementChild;
+      if (!cell || cell.classList.contains('mobile-task-cell')) return;
+      cell.querySelectorAll('.order-controls').forEach(x => x.remove());
+      cell.insertBefore(makeHandle(), cell.firstChild);
     });
   }
 
@@ -55,54 +61,207 @@
     const style = document.createElement('style');
     style.id = 'manualOrderStyle';
     style.textContent = `
-      .order-controls{display:inline-flex;gap:3px;margin-right:4px;vertical-align:middle;}
-      .order-controls button{min-width:26px;padding:4px 5px;font-weight:800;line-height:1;}
-      .order-controls button:disabled{opacity:.28;cursor:default;}
+      .task-drag-handle{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:28px;
+        height:28px;
+        margin-right:5px;
+        border:1px solid #dfe5ed;
+        border-radius:8px;
+        background:#f7f9fc;
+        color:#758196;
+        font-size:15px;
+        font-weight:800;
+        line-height:1;
+        vertical-align:middle;
+        cursor:grab;
+        touch-action:none;
+        user-select:none;
+        -webkit-user-select:none;
+        box-sizing:border-box;
+      }
+      .task-drag-handle:active{cursor:grabbing;}
+      #taskBody tr.task-row-dragging{
+        opacity:.72;
+        outline:2px solid rgba(47,111,237,.38);
+        outline-offset:-2px;
+      }
+      #taskBody tr.task-row-dragging .mobile-task-card{
+        background:#f5f8ff;
+      }
+      body.task-reordering{
+        user-select:none;
+        -webkit-user-select:none;
+      }
       @media(max-width:600px){
-        td:nth-child(9){white-space:normal!important;}
-        .order-controls{display:flex;width:100%;gap:4px;margin:0 0 4px 0;}
-        .order-controls button{flex:1;min-width:0;padding:4px 3px;}
+        .task-drag-handle{
+          width:38px!important;
+          height:32px!important;
+          margin:0!important;
+          border-radius:9px!important;
+          font-size:17px!important;
+          flex:0 0 38px!important;
+        }
       }
     `;
     document.head.appendChild(style);
   }
 
-  function moveVisibleTask(id, direction) {
+  function visibleRows() {
+    return [...document.querySelectorAll('#taskBody tr[data-id]')];
+  }
+
+  function reorderStateToDom() {
+    const ids = visibleRows().map(row => String(row.dataset.id));
+    if (!ids.length) return false;
+
+    const visibleSet = new Set(ids);
+    const slots = [];
+    const byId = new Map(state.tasks.map(t => [String(t.id), t]));
+    state.tasks.forEach((t, index) => {
+      if (visibleSet.has(String(t.id))) slots.push(index);
+    });
+
+    if (slots.length !== ids.length || ids.some(id => !byId.has(id))) return false;
+    slots.forEach((slot, index) => {
+      state.tasks[slot] = byId.get(ids[index]);
+    });
+    return true;
+  }
+
+  function switchToManualUsingCurrentView() {
     ensureManualSortOption();
-    $('#sort').value = 'manual';
-    localStorage.setItem(SORT_KEY, 'manual');
+    const sort = $('#sort');
+    if (!sort) return;
+    if (sort.value !== 'manual') {
+      reorderStateToDom();
+      sort.value = 'manual';
+      localStorage.setItem(SORT_KEY, 'manual');
+    }
+  }
 
-    const visible = manualFiltered();
-    const current = visible.findIndex(t => t.id === id);
-    const target = current + direction;
-    if (current < 0 || target < 0 || target >= visible.length) return;
+  function moveRowAtPointer(clientY) {
+    if (!drag?.row) return;
+    const body = $('#taskBody');
+    const row = drag.row;
+    const others = visibleRows().filter(x => x !== row);
+    if (!others.length) return;
 
-    const currentId = visible[current].id;
-    const targetId = visible[target].id;
-    const currentGlobal = state.tasks.findIndex(t => t.id === currentId);
-    const targetGlobal = state.tasks.findIndex(t => t.id === targetId);
-    if (currentGlobal < 0 || targetGlobal < 0) return;
+    let before = null;
+    for (const item of others) {
+      const rect = item.getBoundingClientRect();
+      if (clientY < rect.top + rect.height / 2) {
+        before = item;
+        break;
+      }
+    }
 
-    [state.tasks[currentGlobal], state.tasks[targetGlobal]] = [state.tasks[targetGlobal], state.tasks[currentGlobal]];
-    save();
-    render();
+    if (before) {
+      if (row.nextElementSibling !== before) body.insertBefore(row, before);
+    } else if (body.lastElementChild !== row) {
+      body.appendChild(row);
+    }
+  }
+
+  function autoScroll(clientY) {
+    const edge = 72;
+    const step = 14;
+    if (clientY < edge) window.scrollBy(0, -step);
+    else if (clientY > window.innerHeight - edge) window.scrollBy(0, step);
+  }
+
+  function finishDrag(saveOrder) {
+    if (!drag) return;
+    const moved = drag.dragging;
+    drag.row?.classList.remove('task-row-dragging');
+    drag = null;
+    document.body.classList.remove('task-reordering');
+
+    if (moved && saveOrder) {
+      reorderStateToDom();
+      save();
+      render();
+    }
+  }
+
+  function bindDragEvents() {
+    const body = $('#taskBody');
+    if (!body || body.dataset.taskDragBound === '1') return;
+    body.dataset.taskDragBound = '1';
+
+    body.addEventListener('click', e => {
+      if (e.target.closest('.task-drag-handle')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
+
+    body.addEventListener('pointerdown', e => {
+      const handle = e.target.closest('.task-drag-handle');
+      if (!handle) return;
+      const row = handle.closest('tr[data-id]');
+      if (!row) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      drag = {
+        pointerId: e.pointerId,
+        row,
+        startX: e.clientX,
+        startY: e.clientY,
+        dragging: false
+      };
+      try { handle.setPointerCapture(e.pointerId); } catch {}
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      if (!drag.dragging && Math.hypot(dx, dy) < 7) return;
+
+      if (!drag.dragging) {
+        switchToManualUsingCurrentView();
+        drag.dragging = true;
+        drag.row.classList.add('task-row-dragging');
+        document.body.classList.add('task-reordering');
+      }
+
+      e.preventDefault();
+      autoScroll(e.clientY);
+      moveRowAtPointer(e.clientY);
+    }, {passive:false});
+
+    window.addEventListener('pointerup', e => {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      finishDrag(true);
+    });
+
+    window.addEventListener('pointercancel', e => {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      finishDrag(true);
+    });
   }
 
   const previousRenderTasks = renderTasks;
   renderTasks = function() {
     previousRenderTasks();
-    addMoveControls();
+    addDragHandles();
   };
 
   const previousRender = render;
   render = function() {
     previousRender();
     ensureManualSortOption();
-    addMoveControls();
+    addDragHandles();
+    bindDragEvents();
   };
 
   ensureManualSortOption();
   installOrderStyles();
+  bindDragEvents();
 
   const sort = $('#sort');
   const savedSort = localStorage.getItem(SORT_KEY);
@@ -122,11 +281,7 @@
     const t = state.tasks.find(x => x.id === id);
     if (!t) return;
 
-    if (e.target.classList.contains('move-up')) {
-      moveVisibleTask(id, -1);
-    } else if (e.target.classList.contains('move-down')) {
-      moveVisibleTask(id, 1);
-    } else if (e.target.classList.contains('check')) {
+    if (e.target.classList.contains('check')) {
       if (e.target.checked) {
         t.status = 'done';
         t.completedAt = Date.now();
