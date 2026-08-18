@@ -47,15 +47,25 @@ thead th:nth-child(2){
 tbody tr.overdue td:nth-child(1),
 tbody tr.overdue td:nth-child(2){background:#fff8f8;}
 
-/* PC/태블릿에서는 한 줄 표시 */
+/* 모든 화면에서 할 일 제목/메모 전체 줄바꿈 */
+td:nth-child(2){
+  white-space:normal !important;
+  vertical-align:top;
+}
+
 td:nth-child(2) b,
 td:nth-child(2) .memo{
   display:block;
   max-width:100%;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  white-space:normal !important;
+  overflow:visible;
+  text-overflow:clip;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+  line-height:1.4;
 }
+
+td:nth-child(2) .memo{margin-top:3px;}
 
 td:nth-child(3) .tag{
   display:block;
@@ -95,24 +105,8 @@ td:nth-child(8) button{
   th:nth-child(1),td:nth-child(1){left:0;}
   th:nth-child(2),td:nth-child(2){left:44px;}
 
-  /* 모바일 할 일은 말줄임 대신 전체 줄바꿈 */
-  td:nth-child(2){
-    white-space:normal !important;
-    vertical-align:top;
-  }
-  td:nth-child(2) b,
-  td:nth-child(2) .memo{
-    display:block;
-    max-width:100%;
-    white-space:normal !important;
-    overflow:visible;
-    text-overflow:clip;
-    word-break:keep-all;
-    overflow-wrap:anywhere;
-    line-height:1.4;
-  }
   td:nth-child(2) b{font-size:12px;}
-  td:nth-child(2) .memo{font-size:10px;margin-top:3px;}
+  td:nth-child(2) .memo{font-size:10px;}
 
   td:nth-child(3) .tag{padding:3px 4px;font-size:10px;}
   td:nth-child(4) .tag,td:nth-child(5) .tag{padding:3px 3px;font-size:10px;}
