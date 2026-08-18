@@ -150,17 +150,15 @@
           align-items:center;
           flex-wrap:wrap;
         }
-        .mobile-task-actions .order-controls{
-          display:flex!important;
-          width:auto!important;
-          gap:6px!important;
+        .mobile-task-actions .task-drag-handle{
+          width:42px!important;
+          height:32px!important;
+          flex:0 0 42px!important;
           margin:0!important;
-          flex:0 0 auto!important;
         }
-        .mobile-task-actions button,
-        .mobile-task-actions .order-controls button{
+        .mobile-task-actions button{
           width:auto!important;
-          min-width:42px!important;
+          min-width:52px!important;
           max-width:none!important;
           flex:0 0 auto!important;
           padding:6px 10px!important;
@@ -187,7 +185,7 @@
 
   function mobileRenderTasks() {
     const a = filtered();
-    $('#taskBody').innerHTML = a.map((t,index) => {
+    $('#taskBody').innerHTML = a.map(t => {
       const overdue = t.status !== 'done' && t.dueDate && t.dueDate < today();
       const due = t.dueDate
         ? `${esc(t.dueDate)} <span class="dday">${dday(t.dueDate)}</span>`
@@ -211,10 +209,7 @@
               <div class="mobile-info-row"><span class="mobile-info-label">완료일시</span><span class="mobile-info-value date-value">${esc(formatCompletedAt(t.completedAt))}</span></div>
             </div>
             <div class="mobile-task-actions">
-              <span class="order-controls">
-                <button type="button" class="move-up" title="위로 이동" aria-label="위로 이동" ${index===0?'disabled':''}>↑</button>
-                <button type="button" class="move-down" title="아래로 이동" aria-label="아래로 이동" ${index===a.length-1?'disabled':''}>↓</button>
-              </span>
+              <span class="task-drag-handle" title="잡고 끌어서 할 일 순서 변경" role="button" aria-label="할 일 순서 변경" tabindex="0">↕</span>
               <button type="button" class="edit">수정</button>
               <button type="button" class="delete danger">삭제</button>
             </div>
