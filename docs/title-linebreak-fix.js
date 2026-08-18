@@ -2,12 +2,17 @@
   const body = document.querySelector('#taskBody');
   if (!body) return;
 
-  function applyTitleLineBreaks() {
-    body.querySelectorAll('td:nth-child(2) b, .mobile-task-title').forEach(el => {
+  function applySavedLineBreaks() {
+    body.querySelectorAll(
+      'td:nth-child(2) b, td:nth-child(2) .memo, .mobile-task-title, .mobile-task-memo'
+    ).forEach(el => {
       if (el.dataset.linebreakFixed === '1') return;
 
       const text = (el.textContent || '').replace(/\r\n?/g, '\n');
       el.style.setProperty('white-space', 'pre-wrap', 'important');
+      el.style.setProperty('overflow', 'visible', 'important');
+      el.style.setProperty('text-overflow', 'clip', 'important');
+      el.style.setProperty('display', 'block', 'important');
 
       if (text.includes('\n')) {
         const fragment = document.createDocumentFragment();
@@ -25,19 +30,19 @@
   const previousRenderTasks = renderTasks;
   renderTasks = function() {
     previousRenderTasks();
-    applyTitleLineBreaks();
+    applySavedLineBreaks();
   };
 
   const previousRender = render;
   render = function() {
     previousRender();
-    applyTitleLineBreaks();
+    applySavedLineBreaks();
   };
 
   const observer = new MutationObserver(() => {
-    requestAnimationFrame(applyTitleLineBreaks);
+    requestAnimationFrame(applySavedLineBreaks);
   });
   observer.observe(body, {childList:true, subtree:true});
 
-  applyTitleLineBreaks();
+  applySavedLineBreaks();
 })();
