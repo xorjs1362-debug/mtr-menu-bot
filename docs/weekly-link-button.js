@@ -19,24 +19,35 @@
     }
     if(button){
       const old = button.textContent;
-      button.textContent = '링크 복사됨';
+      button.textContent = '복사됨';
       setTimeout(() => button.textContent = old, 1000);
     }
   }
 
+  function removeWeeklyButton(){
+    document.getElementById('weeklyChecklistLinkCopy')?.remove();
+  }
+
   function install(){
-    const options = document.querySelector('#weeklyBackdrop .weekly-options');
-    if(!options || document.getElementById('weeklyChecklistLinkCopy')) return;
+    removeWeeklyButton();
+
+    const headerActions = document.querySelector('.header-actions');
+    if(!headerActions || document.getElementById('mainChecklistLinkCopy')) return;
 
     const button = document.createElement('button');
-    button.id = 'weeklyChecklistLinkCopy';
+    button.id = 'mainChecklistLinkCopy';
     button.type = 'button';
-    button.textContent = '체크리스트 링크 복사';
-    button.title = '현재 체크리스트 주소 복사';
+    button.textContent = '링크 복사';
+    button.title = '체크리스트 주소 복사';
     button.onclick = () => copy(checklistUrl(), button);
 
-    const refresh = document.getElementById('weeklyRefresh');
-    options.insertBefore(button, refresh || null);
+    const weekly = document.getElementById('weeklyReportBtn');
+    if(weekly?.nextSibling) headerActions.insertBefore(button, weekly.nextSibling);
+    else if(weekly) headerActions.appendChild(button);
+    else {
+      const manage = document.getElementById('manageProjectsBtn');
+      headerActions.insertBefore(button, manage || null);
+    }
   }
 
   install();
