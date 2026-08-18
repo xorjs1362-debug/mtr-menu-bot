@@ -7,10 +7,13 @@
 
 table{table-layout:fixed;}
 
-/* 기본(PC/태블릿) 열 폭 */
+/* 기본(PC/태블릿) 열 폭: 할 일은 넓게, 상태/우선순위/작성일은 압축 */
 th:nth-child(1),td:nth-child(1){width:58px;min-width:58px;max-width:58px;}
-th:nth-child(2),td:nth-child(2){width:250px;min-width:250px;max-width:250px;}
-th:nth-child(3),td:nth-child(3){width:120px;min-width:120px;max-width:120px;}
+th:nth-child(2),td:nth-child(2){width:320px;min-width:320px;max-width:320px;}
+th:nth-child(3),td:nth-child(3){width:110px;min-width:110px;max-width:110px;}
+th:nth-child(4),td:nth-child(4){width:80px;min-width:80px;max-width:80px;text-align:center;}
+th:nth-child(5),td:nth-child(5){width:76px;min-width:76px;max-width:76px;text-align:center;}
+th:nth-child(6),td:nth-child(6){width:92px;min-width:92px;max-width:92px;white-space:nowrap;}
 
 /* 완료 + 할 일만 고정 */
 th:nth-child(1),td:nth-child(1),
@@ -38,7 +41,7 @@ thead th:nth-child(2){
 tbody tr.overdue td:nth-child(1),
 tbody tr.overdue td:nth-child(2){background:#fff8f8;}
 
-/* 좁은 고정 칸에서 텍스트가 겹치지 않게 */
+/* 할 일 제목/메모는 가능한 길게 보여주되 칸을 넘지 않게 */
 td:nth-child(2) b,
 td:nth-child(2) .memo{
   overflow:hidden;
@@ -55,15 +58,27 @@ td:nth-child(3) .tag{
   white-space:nowrap;
 }
 
-/* 휴대폰에서는 고정 영역을 최대한 작게 */
+/* 좁아진 상태/우선순위 칸 */
+td:nth-child(4) .tag,
+td:nth-child(5) .tag{
+  padding-left:5px;
+  padding-right:5px;
+  white-space:nowrap;
+}
+
+/* 휴대폰: 할 일 폭을 크게 확보 */
 @media(max-width:600px){
-  th,td{padding-left:8px;padding-right:8px;}
+  th,td{padding-left:7px;padding-right:7px;}
   th:nth-child(1),td:nth-child(1){width:44px;min-width:44px;max-width:44px;padding-left:7px;padding-right:5px;}
-  th:nth-child(2),td:nth-child(2){width:160px;min-width:160px;max-width:160px;}
-  th:nth-child(3),td:nth-child(3){width:88px;min-width:88px;max-width:88px;}
+  th:nth-child(2),td:nth-child(2){width:220px;min-width:220px;max-width:220px;}
+  th:nth-child(3),td:nth-child(3){width:82px;min-width:82px;max-width:82px;}
+  th:nth-child(4),td:nth-child(4){width:76px;min-width:76px;max-width:76px;}
+  th:nth-child(5),td:nth-child(5){width:70px;min-width:70px;max-width:70px;}
+  th:nth-child(6),td:nth-child(6){width:86px;min-width:86px;max-width:86px;padding-left:5px;padding-right:5px;font-size:11px;}
   th:nth-child(1),td:nth-child(1){left:0;}
   th:nth-child(2),td:nth-child(2){left:44px;}
   td:nth-child(2) b{font-size:12px;}
   td:nth-child(2) .memo{font-size:10px;}
   td:nth-child(3) .tag{padding:3px 5px;font-size:10px;}
+  td:nth-child(4) .tag,td:nth-child(5) .tag{padding:3px 4px;font-size:10px;}
 }
