@@ -25,13 +25,13 @@
     const p=(state.projects||[]).find(x=>String(x.id)===String(t.projectId));
     return p?.name || '기타';
   }
-  function taskBlock(t){
+  function taskBlock(t,suffix=''){
     const title=String(t.title||'').replace(/\r\n?/g,'\n').trim();
     const memo=String(t.memo||'').replace(/\r\n?/g,'\n').trim();
     const titleLines=title.split('\n').filter(Boolean);
     const lines=[];
     if(titleLines.length){
-      lines.push(titleLines[0]);
+      lines.push(titleLines[0]+suffix);
       titleLines.slice(1).forEach(x=>lines.push(`      ${x}`));
     }
     if(memo){
@@ -54,9 +54,9 @@
       .map(p=>String(p.name));
     if(!projectOrder.includes('기타')) projectOrder.push('기타');
 
-    const groups=new Map(projectOrder.map(name=>[name,{name,current:[],next:[],notes:[]} ]));
+    const groups=new Map(projectOrder.map(name=>[name,{name,current:[],next:[],followupIds:new Set(),notes:[]} ]));
     const ensure=name=>{
-      if(!groups.has(name)) groups.set(name,{name,current:[],next:[],notes:[]});
+      if(!groups.has(name)) groups.set(name,{name,current:[],next:[],followupIds:new Set(),notes:[]});
       return groups.get(name);
     };
 
@@ -76,13 +76,19 @@
       const dueNextWeek=incomplete && inRange(due,nextStart,nextEnd);
       const waiting=incomplete && t.status==='wait';
       const ongoingNoDue=incomplete && !due;
+      const inCurrent=doneThisWeek || overdue || dueThisWeek || activeNow || newThisWeek;
 
-      if(doneThisWeek || overdue || dueThisWeek || activeNow || newThisWeek){
+      if(inCurrent){
         g.current.push(t);
       }
-      if(dueNextWeek || waiting || ongoingNoDue){
+
+      if(incomplete && inCurrent){
+        g.next.push(t);
+        g.followupIds.add(String(t.id));
+      }else if(dueNextWeek || waiting || ongoingNoDue){
         g.next.push(t);
       }
+
       if(overdue){
         g.notes.push(`기한 초과: ${String(t.title||'').split(/\r?\n/)[0]} (${fmtMD(due)} 마감)`);
       }
@@ -97,8 +103,8 @@
     groups.forEach(g=>{
       g.current=unique(g.current);
       g.next=unique(g.next);
-      const currentText=g.current.map(taskBlock).filter(Boolean).join('\n');
-      const nextText=g.next.map(taskBlock).filter(Boolean).join('\n');
+      const currentText=g.current.map(t=>taskBlock(t)).filter(Boolean).join('\n');
+      const nextText=g.next.map(t=>taskBlock(t,g.followupIds.has(String(t.id))?' F/UP':'')).filter(Boolean).join('\n');
       const notesText=[...new Set(g.notes)].join('\n');
       if(currentText || nextText || notesText){
         result.push({name:g.name,currentText,nextText,notesText});
