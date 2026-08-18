@@ -1,4 +1,9 @@
 (() => {
+  const stickyCss = document.createElement('link');
+  stickyCss.rel = 'stylesheet';
+  stickyCss.href = './sticky-columns.css?v=5';
+  document.head.appendChild(stickyCss);
+
   let deferredPrompt = null;
   const startedAt = Date.now();
 
