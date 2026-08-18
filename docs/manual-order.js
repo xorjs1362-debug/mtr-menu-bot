@@ -1,6 +1,6 @@
 (() => {
   const SORT_KEY = 'todo:lastSort';
-  const HOLD_MS = 2000;
+  const HOLD_MS = 1000;
   const MOVE_CANCEL_PX = 8;
   let drag = null;
 
@@ -41,9 +41,9 @@
     const handle = document.createElement('span');
     handle.className = 'task-drag-handle';
     handle.textContent = '↕';
-    handle.title = '2초 이상 길게 눌러 할 일 순서 변경';
+    handle.title = '1초 이상 길게 눌러 할 일 순서 변경';
     handle.setAttribute('role', 'button');
-    handle.setAttribute('aria-label', '2초 이상 길게 눌러 할 일 순서 변경');
+    handle.setAttribute('aria-label', '1초 이상 길게 눌러 할 일 순서 변경');
     handle.setAttribute('tabindex', '0');
     return handle;
   }
