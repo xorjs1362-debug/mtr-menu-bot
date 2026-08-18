@@ -1,5 +1,5 @@
 (() => {
-  const HOLD_MS = 2000;
+  const HOLD_MS = 1000;
   const MOVE_CANCEL_PX = 8;
   let drag = null;
 
@@ -48,7 +48,6 @@
         outline-offset:2px;
       }
 
-      /* 수정창에서 할 일 제목 직접 줄바꿈 */
       #editTitle{
         min-height:110px;
         resize:vertical;
@@ -56,7 +55,6 @@
         white-space:pre-wrap;
       }
 
-      /* 사용자가 입력한 줄바꿈을 웹/모바일 목록에 그대로 표시 */
       td:nth-child(2) b,
       .mobile-task-title{
         white-space:pre-wrap !important;
@@ -107,9 +105,9 @@
         const handle = document.createElement('span');
         handle.className = 'project-drag-handle';
         handle.textContent = '↔';
-        handle.title = '2초 이상 길게 눌러 프로젝트 탭 순서 변경';
+        handle.title = '1초 이상 길게 눌러 프로젝트 탭 순서 변경';
         handle.setAttribute('role','button');
-        handle.setAttribute('aria-label','2초 이상 길게 눌러 프로젝트 탭 순서 변경');
+        handle.setAttribute('aria-label','1초 이상 길게 눌러 프로젝트 탭 순서 변경');
         btn.appendChild(handle);
       }
     });
