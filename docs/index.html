@@ -2,8 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f6fed">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="할 일">
 <title>프로젝트 할 일 체크리스트</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
 <link rel="stylesheet" href="./style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -64,5 +72,10 @@
 <div id="projectBackdrop" class="backdrop"><div class="modal"><div class="modal-head"><h2>프로젝트 관리</h2><button id="projectCloseBtn">×</button></div><div class="project-add"><input id="projectNameInput" placeholder="새 프로젝트 이름"><button id="addProjectBtn" class="primary">추가</button></div><div id="projectList" class="project-list"></div><div class="modal-foot end"><button id="projectDoneBtn">닫기</button></div></div></div>
 
 <script src="./app.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.error));
+}
+</script>
 </body>
 </html>
