@@ -1,0 +1,66 @@
+/* 가로 스크롤 시 완료/할 일/프로젝트 열을 왼쪽에 고정 */
+.table-wrap{
+  position:relative;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+table{table-layout:fixed;}
+
+/* 기본(PC/태블릿) 고정 열 폭 */
+th:nth-child(1),td:nth-child(1){width:58px;min-width:58px;max-width:58px;}
+th:nth-child(2),td:nth-child(2){width:250px;min-width:250px;max-width:250px;}
+th:nth-child(3),td:nth-child(3){width:120px;min-width:120px;max-width:120px;}
+
+th:nth-child(1),td:nth-child(1),
+th:nth-child(2),td:nth-child(2),
+th:nth-child(3),td:nth-child(3){
+  position:sticky;
+  background:#fff;
+  background-clip:padding-box;
+}
+
+th:nth-child(1),td:nth-child(1){left:0;z-index:5;}
+th:nth-child(2),td:nth-child(2){left:58px;z-index:4;}
+th:nth-child(3),td:nth-child(3){left:308px;z-index:4;border-right:1px solid #dfe5ed;box-shadow:8px 0 12px -12px rgba(15,23,42,.65);}
+
+thead th:nth-child(1),
+thead th:nth-child(2),
+thead th:nth-child(3){
+  z-index:8;
+  background:#fbfcfe;
+}
+
+/* 행 배경색이 있는 경우 고정 열도 같은 색으로 유지 */
+tbody tr.overdue td:nth-child(1),
+tbody tr.overdue td:nth-child(2),
+tbody tr.overdue td:nth-child(3){background:#fff8f8;}
+
+/* 좁은 고정 칸에서 텍스트가 겹치지 않게 */
+td:nth-child(2) b,
+td:nth-child(2) .memo{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+td:nth-child(3) .tag{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* 휴대폰에서는 고정 영역을 최대한 작게 */
+@media(max-width:600px){
+  th,td{padding-left:8px;padding-right:8px;}
+  th:nth-child(1),td:nth-child(1){width:44px;min-width:44px;max-width:44px;padding-left:7px;padding-right:5px;}
+  th:nth-child(2),td:nth-child(2){width:160px;min-width:160px;max-width:160px;}
+  th:nth-child(3),td:nth-child(3){width:88px;min-width:88px;max-width:88px;}
+  th:nth-child(1),td:nth-child(1){left:0;}
+  th:nth-child(2),td:nth-child(2){left:44px;}
+  th:nth-child(3),td:nth-child(3){left:204px;}
+  td:nth-child(2) b{font-size:12px;}
+  td:nth-child(2) .memo{font-size:10px;}
+  td:nth-child(3) .tag{padding:3px 5px;font-size:10px;}
+}
