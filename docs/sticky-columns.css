@@ -5,15 +5,22 @@
   -webkit-overflow-scrolling:touch;
 }
 
-table{table-layout:fixed;}
+/* 모든 열의 폭을 명시해 남는 폭이 마감일/관리로 몰리지 않도록 함 */
+table{
+  table-layout:fixed;
+  width:1180px;
+  min-width:1180px;
+}
 
-/* 기본(PC/태블릿) 열 폭: 할 일은 넓게, 상태/우선순위/작성일은 압축 */
+/* PC/태블릿 */
 th:nth-child(1),td:nth-child(1){width:58px;min-width:58px;max-width:58px;}
-th:nth-child(2),td:nth-child(2){width:320px;min-width:320px;max-width:320px;}
-th:nth-child(3),td:nth-child(3){width:110px;min-width:110px;max-width:110px;}
+th:nth-child(2),td:nth-child(2){width:470px;min-width:470px;max-width:470px;}
+th:nth-child(3),td:nth-child(3){width:105px;min-width:105px;max-width:105px;}
 th:nth-child(4),td:nth-child(4){width:80px;min-width:80px;max-width:80px;text-align:center;}
 th:nth-child(5),td:nth-child(5){width:76px;min-width:76px;max-width:76px;text-align:center;}
 th:nth-child(6),td:nth-child(6){width:92px;min-width:92px;max-width:92px;white-space:nowrap;}
+th:nth-child(7),td:nth-child(7){width:160px;min-width:160px;max-width:160px;white-space:nowrap;}
+th:nth-child(8),td:nth-child(8){width:139px;min-width:139px;max-width:139px;white-space:nowrap;}
 
 /* 완료 + 할 일만 고정 */
 th:nth-child(1),td:nth-child(1),
@@ -37,19 +44,19 @@ thead th:nth-child(2){
   background:#fbfcfe;
 }
 
-/* 행 배경색이 있는 경우 고정 열도 같은 색으로 유지 */
 tbody tr.overdue td:nth-child(1),
 tbody tr.overdue td:nth-child(2){background:#fff8f8;}
 
-/* 할 일 제목/메모는 가능한 길게 보여주되 칸을 넘지 않게 */
+/* 할 일은 한 줄에서 최대한 길게 표시 */
 td:nth-child(2) b,
 td:nth-child(2) .memo{
+  display:block;
+  max-width:100%;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
-/* 프로젝트는 일반 스크롤 열 */
 td:nth-child(3) .tag{
   display:block;
   max-width:100%;
@@ -58,7 +65,6 @@ td:nth-child(3) .tag{
   white-space:nowrap;
 }
 
-/* 좁아진 상태/우선순위 칸 */
 td:nth-child(4) .tag,
 td:nth-child(5) .tag{
   padding-left:5px;
@@ -66,19 +72,33 @@ td:nth-child(5) .tag{
   white-space:nowrap;
 }
 
-/* 휴대폰: 할 일 폭을 크게 확보 */
+/* 관리 버튼이 열 폭을 키우지 않도록 컴팩트하게 */
+td:nth-child(8) button{
+  padding:6px 8px;
+  font-size:11px;
+}
+
+/* 휴대폰: 총 850px 안에서 할 일을 가장 넓게 확보 */
 @media(max-width:600px){
+  table{
+    width:850px;
+    min-width:850px;
+  }
   th,td{padding-left:7px;padding-right:7px;}
   th:nth-child(1),td:nth-child(1){width:44px;min-width:44px;max-width:44px;padding-left:7px;padding-right:5px;}
-  th:nth-child(2),td:nth-child(2){width:220px;min-width:220px;max-width:220px;}
+  th:nth-child(2),td:nth-child(2){width:260px;min-width:260px;max-width:260px;}
   th:nth-child(3),td:nth-child(3){width:82px;min-width:82px;max-width:82px;}
-  th:nth-child(4),td:nth-child(4){width:76px;min-width:76px;max-width:76px;}
-  th:nth-child(5),td:nth-child(5){width:70px;min-width:70px;max-width:70px;}
-  th:nth-child(6),td:nth-child(6){width:86px;min-width:86px;max-width:86px;padding-left:5px;padding-right:5px;font-size:11px;}
+  th:nth-child(4),td:nth-child(4){width:72px;min-width:72px;max-width:72px;}
+  th:nth-child(5),td:nth-child(5){width:64px;min-width:64px;max-width:64px;}
+  th:nth-child(6),td:nth-child(6){width:82px;min-width:82px;max-width:82px;padding-left:4px;padding-right:4px;font-size:10px;}
+  th:nth-child(7),td:nth-child(7){width:134px;min-width:134px;max-width:134px;padding-left:5px;padding-right:5px;font-size:11px;}
+  th:nth-child(8),td:nth-child(8){width:112px;min-width:112px;max-width:112px;padding-left:4px;padding-right:4px;}
   th:nth-child(1),td:nth-child(1){left:0;}
   th:nth-child(2),td:nth-child(2){left:44px;}
   td:nth-child(2) b{font-size:12px;}
   td:nth-child(2) .memo{font-size:10px;}
   td:nth-child(3) .tag{padding:3px 5px;font-size:10px;}
   td:nth-child(4) .tag,td:nth-child(5) .tag{padding:3px 4px;font-size:10px;}
+  td:nth-child(7) .dday{padding:2px 5px;font-size:10px;}
+  td:nth-child(8) button{padding:5px 6px;font-size:10px;}
 }
