@@ -1,5 +1,5 @@
-const CACHE='todo-pwa-v19';
-const ASSETS=['./','./index.html','./style.css','./sticky-columns.css','./app.js','./app-overrides.js','./completion-tracking.js','./manual-order.js','./pwa-install.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
+const CACHE='todo-pwa-v20';
+const ASSETS=['./','./index.html','./style.css','./sticky-columns.css','./app.js','./app-overrides.js','./completion-tracking.js','./manual-order.js','./mobile-layout-fix.js','./pwa-install.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
