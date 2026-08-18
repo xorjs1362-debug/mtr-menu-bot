@@ -5,22 +5,22 @@
   -webkit-overflow-scrolling:touch;
 }
 
-/* 전체 폭은 고정하고, 할 일 열에 가장 많은 폭을 배정 */
+/* 전체 표 폭은 유지하고 열 비율만 재배분 */
 table{
   table-layout:fixed;
   width:1180px;
   min-width:1180px;
 }
 
-/* PC/태블릿: 합계 1180px */
+/* PC/태블릿: 할 일 20% 축소(560→448), 줄인 112px을 나머지 6개 열에 균등 배분 */
 th:nth-child(1),td:nth-child(1){width:58px;min-width:58px;max-width:58px;}
-th:nth-child(2),td:nth-child(2){width:560px;min-width:560px;max-width:560px;}
-th:nth-child(3),td:nth-child(3){width:98px;min-width:98px;max-width:98px;}
-th:nth-child(4),td:nth-child(4){width:72px;min-width:72px;max-width:72px;text-align:center;}
-th:nth-child(5),td:nth-child(5){width:66px;min-width:66px;max-width:66px;text-align:center;}
-th:nth-child(6),td:nth-child(6){width:84px;min-width:84px;max-width:84px;white-space:nowrap;}
-th:nth-child(7),td:nth-child(7){width:128px;min-width:128px;max-width:128px;white-space:nowrap;}
-th:nth-child(8),td:nth-child(8){width:114px;min-width:114px;max-width:114px;white-space:nowrap;}
+th:nth-child(2),td:nth-child(2){width:448px;min-width:448px;max-width:448px;}
+th:nth-child(3),td:nth-child(3){width:117px;min-width:117px;max-width:117px;}
+th:nth-child(4),td:nth-child(4){width:91px;min-width:91px;max-width:91px;text-align:center;}
+th:nth-child(5),td:nth-child(5){width:85px;min-width:85px;max-width:85px;text-align:center;}
+th:nth-child(6),td:nth-child(6){width:103px;min-width:103px;max-width:103px;white-space:nowrap;}
+th:nth-child(7),td:nth-child(7){width:146px;min-width:146px;max-width:146px;white-space:nowrap;}
+th:nth-child(8),td:nth-child(8){width:132px;min-width:132px;max-width:132px;white-space:nowrap;}
 
 /* 완료 + 할 일만 고정 */
 th:nth-child(1),td:nth-child(1),
@@ -47,7 +47,7 @@ thead th:nth-child(2){
 tbody tr.overdue td:nth-child(1),
 tbody tr.overdue td:nth-child(2){background:#fff8f8;}
 
-/* 할 일 제목/메모는 넓은 칸을 최대한 활용 */
+/* 할 일 제목/메모는 칸 안에서 최대한 길게 표시 */
 td:nth-child(2) b,
 td:nth-child(2) .memo{
   display:block;
@@ -77,7 +77,7 @@ td:nth-child(8) button{
   font-size:10px;
 }
 
-/* 휴대폰: 할 일 300px 확보, 나머지는 최소 폭 */
+/* 휴대폰: 할 일 20% 축소(300→240), 줄인 60px을 나머지 6개 열에 10px씩 배분 */
 @media(max-width:600px){
   table{
     width:850px;
@@ -85,13 +85,13 @@ td:nth-child(8) button{
   }
   th,td{padding-left:6px;padding-right:6px;}
   th:nth-child(1),td:nth-child(1){width:44px;min-width:44px;max-width:44px;padding-left:7px;padding-right:5px;}
-  th:nth-child(2),td:nth-child(2){width:300px;min-width:300px;max-width:300px;}
-  th:nth-child(3),td:nth-child(3){width:78px;min-width:78px;max-width:78px;}
-  th:nth-child(4),td:nth-child(4){width:68px;min-width:68px;max-width:68px;}
-  th:nth-child(5),td:nth-child(5){width:60px;min-width:60px;max-width:60px;}
-  th:nth-child(6),td:nth-child(6){width:78px;min-width:78px;max-width:78px;padding-left:3px;padding-right:3px;font-size:10px;}
-  th:nth-child(7),td:nth-child(7){width:126px;min-width:126px;max-width:126px;padding-left:4px;padding-right:4px;font-size:10px;}
-  th:nth-child(8),td:nth-child(8){width:96px;min-width:96px;max-width:96px;padding-left:3px;padding-right:3px;}
+  th:nth-child(2),td:nth-child(2){width:240px;min-width:240px;max-width:240px;}
+  th:nth-child(3),td:nth-child(3){width:88px;min-width:88px;max-width:88px;}
+  th:nth-child(4),td:nth-child(4){width:78px;min-width:78px;max-width:78px;}
+  th:nth-child(5),td:nth-child(5){width:70px;min-width:70px;max-width:70px;}
+  th:nth-child(6),td:nth-child(6){width:88px;min-width:88px;max-width:88px;padding-left:3px;padding-right:3px;font-size:10px;}
+  th:nth-child(7),td:nth-child(7){width:136px;min-width:136px;max-width:136px;padding-left:4px;padding-right:4px;font-size:10px;}
+  th:nth-child(8),td:nth-child(8){width:106px;min-width:106px;max-width:106px;padding-left:3px;padding-right:3px;}
   th:nth-child(1),td:nth-child(1){left:0;}
   th:nth-child(2),td:nth-child(2){left:44px;}
   td:nth-child(2) b{font-size:12px;}
