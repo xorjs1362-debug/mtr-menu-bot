@@ -16,6 +16,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="auth-loading">
+<button id="installBtn" type="button" style="position:fixed;top:12px;right:12px;z-index:10000;border:0;border-radius:10px;padding:9px 13px;background:#2f6fed;color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(47,111,237,.28);cursor:pointer">앱 설치</button>
+
 <section id="loginScreen" class="login-screen">
   <div class="login-card">
     <div class="brand">PRIVATE TODO</div>
@@ -72,10 +74,6 @@
 <div id="projectBackdrop" class="backdrop"><div class="modal"><div class="modal-head"><h2>프로젝트 관리</h2><button id="projectCloseBtn">×</button></div><div class="project-add"><input id="projectNameInput" placeholder="새 프로젝트 이름"><button id="addProjectBtn" class="primary">추가</button></div><div id="projectList" class="project-list"></div><div class="modal-foot end"><button id="projectDoneBtn">닫기</button></div></div></div>
 
 <script src="./app.js"></script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.error));
-}
-</script>
+<script src="./pwa-install.js"></script>
 </body>
 </html>
