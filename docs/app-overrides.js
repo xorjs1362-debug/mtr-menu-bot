@@ -13,10 +13,6 @@
     return changed;
   }
 
-  // 상태 표시: 진행중 / 대기 / 완료만 사용
-  statusLabel = s => ({doing:'진행중', wait:'대기', done:'완료'}[s] || '진행중');
-
-  // 기존 저장 데이터에 todo 상태가 있으면 진행중으로 자동 변환
   const originalEnter = enter;
   enter = async function() {
     await originalEnter();
@@ -33,7 +29,6 @@
     render();
   };
 
-  // 프로젝트순 정렬 추가
   filtered = function() {
     let a = base();
     const q = $('#search').value.trim().toLowerCase();
@@ -71,7 +66,6 @@
     $('#newDuePreview').textContent = duePreview(input.value);
   }
 
-  // 새 할 일 추가: 기본 상태는 진행중, 마감일은 마지막 선택값 유지
   addTask = function() {
     const title = $('#newTitle').value.trim();
     if (!title) return $('#newTitle').focus();
@@ -95,7 +89,6 @@
     $('#newStatus').value = 'doing';
     $('#newPriority').value = 'mid';
     $('#newCreatedDate').value = today();
-    // 마감일은 지우지 않음
     $('#newDueDate').value = dueDate;
     $('#newDuePreview').textContent = duePreview(dueDate);
     save();
@@ -132,7 +125,6 @@
   applyStatusUI();
   restoreLastDue();
 
-  // 기존 핸들러를 새 동작으로 교체
   $('#addBtn').onclick = addTask;
   $('#newTitle').onkeydown = e => { if (e.key === 'Enter') addTask(); };
   $('#newDueDate').oninput = e => {
@@ -140,7 +132,6 @@
     $('#newDuePreview').textContent = duePreview(e.target.value);
   };
 
-  // 완료 체크를 해제하면 '진행중'으로 복귀
   $('#taskBody').onclick = e => {
     const tr = e.target.closest('tr[data-id]');
     if (!tr) return;
@@ -159,6 +150,5 @@
     }
   };
 
-  // 이미 로드된 로컬 상태도 즉시 정리
   if (normalizeStatuses()) save();
 })();
