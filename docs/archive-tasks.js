@@ -97,10 +97,8 @@
 
   function archiveTask(task){
     if(!task) return;
-    if(task.status !== 'done'){
-      task.status = 'done';
-      if(!task.completedAt) task.completedAt = Date.now();
-    }
+    if(task.status !== 'done') task.status = 'done';
+    if(!task.completedAt) task.completedAt = Date.now();
     task.archived = true;
     task.archivedAt = Date.now();
   }
@@ -124,6 +122,17 @@
     addArchiveButtons();
     updateFooter();
   };
+
+  const tabs = $('#tabs');
+  if(tabs){
+    tabs.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tab]');
+      if(tab?.dataset.tab === ARCHIVE_TAB){
+        const filter = $('#filterStatus');
+        if(filter) filter.value = 'all';
+      }
+    }, true);
+  }
 
   const body = $('#taskBody');
   if(body){
