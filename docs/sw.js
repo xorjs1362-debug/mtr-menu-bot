@@ -1,4 +1,4 @@
-const CACHE='todo-pwa-v31';
+const CACHE='todo-pwa-v32';
 const ASSETS=['./','./index.html','./style.css','./sticky-columns.css','./app.js','./app-overrides.js','./completion-tracking.js','./manual-order.js','./mobile-layout-fix.js','./project-tab-order.js','./title-linebreak-fix.js','./weekly-report.js','./weekly-mobile-fix.js','./weekly-link-button.js','./archive-tasks.js','./pwa-install.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{
