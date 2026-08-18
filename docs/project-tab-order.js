@@ -35,6 +35,21 @@
         outline:2px solid rgba(47,111,237,.35);
         outline-offset:2px;
       }
+
+      /* 수정창에서 할 일 제목 직접 줄바꿈 */
+      #editTitle{
+        min-height:110px;
+        resize:vertical;
+        line-height:1.45;
+        white-space:pre-wrap;
+      }
+
+      /* 사용자가 입력한 줄바꿈을 웹/모바일 목록에 그대로 표시 */
+      td:nth-child(2) b,
+      .mobile-task-title{
+        white-space:pre-wrap !important;
+      }
+
       @media(max-width:600px){
         #tabs .project-drag-handle{
           width:22px;
@@ -42,9 +57,22 @@
           margin-left:1px;
           font-size:13px;
         }
+        #editTitle{min-height:120px;}
       }
     `;
     document.head.appendChild(style);
+  }
+
+  function enableMultilineEditTitle() {
+    const current = $('#editTitle');
+    if (!current || current.tagName === 'TEXTAREA') return;
+
+    const textarea = document.createElement('textarea');
+    textarea.id = 'editTitle';
+    textarea.rows = 4;
+    textarea.value = current.value || '';
+    textarea.placeholder = '할 일을 입력하세요. Enter로 줄바꿈할 수 있습니다.';
+    current.replaceWith(textarea);
   }
 
   function projectIds() {
@@ -190,11 +218,13 @@
   const previousRender = render;
   render = function() {
     previousRender();
+    enableMultilineEditTitle();
     decorateTabs();
     bindEvents();
   };
 
   installStyles();
+  enableMultilineEditTitle();
   decorateTabs();
   bindEvents();
 })();
