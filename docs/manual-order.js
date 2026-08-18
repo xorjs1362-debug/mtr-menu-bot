@@ -1,5 +1,7 @@
 (() => {
   const SORT_KEY = 'todo:lastSort';
+  const HOLD_MS = 2000;
+  const MOVE_CANCEL_PX = 8;
   let drag = null;
 
   function ensureManualSortOption() {
@@ -39,9 +41,9 @@
     const handle = document.createElement('span');
     handle.className = 'task-drag-handle';
     handle.textContent = '↕';
-    handle.title = '잡고 끌어서 할 일 순서 변경';
+    handle.title = '2초 이상 길게 눌러 할 일 순서 변경';
     handle.setAttribute('role', 'button');
-    handle.setAttribute('aria-label', '할 일 순서 변경');
+    handle.setAttribute('aria-label', '2초 이상 길게 눌러 할 일 순서 변경');
     handle.setAttribute('tabindex', '0');
     return handle;
   }
@@ -77,12 +79,22 @@
         line-height:1;
         vertical-align:middle;
         cursor:grab;
-        touch-action:none;
+        touch-action:auto;
         user-select:none;
         -webkit-user-select:none;
+        -webkit-touch-callout:none;
         box-sizing:border-box;
+        transition:background .15s,box-shadow .15s,transform .15s;
       }
-      .task-drag-handle:active{cursor:grabbing;}
+      .task-drag-handle.hold-pending{
+        transform:scale(.96);
+        box-shadow:inset 0 0 0 2px rgba(47,111,237,.20);
+      }
+      .task-drag-handle.hold-active{
+        cursor:grabbing;
+        background:#eaf1ff;
+        box-shadow:inset 0 0 0 2px rgba(47,111,237,.45);
+      }
       #taskBody tr.task-row-dragging{
         opacity:.72;
         outline:2px solid rgba(47,111,237,.38);
@@ -94,6 +106,7 @@
       body.task-reordering{
         user-select:none;
         -webkit-user-select:none;
+        overscroll-behavior:none;
       }
       @media(max-width:600px){
         .task-drag-handle{
@@ -103,6 +116,7 @@
           border-radius:9px!important;
           font-size:17px!important;
           flex:0 0 38px!important;
+          touch-action:auto!important;
         }
       }
     `;
@@ -143,7 +157,7 @@
   }
 
   function moveRowAtPointer(clientY) {
-    if (!drag?.row) return;
+    if (!drag?.row || !drag.activated) return;
     const body = $('#taskBody');
     const row = drag.row;
     const others = visibleRows().filter(x => x !== row);
@@ -172,18 +186,63 @@
     else if (clientY > window.innerHeight - edge) window.scrollBy(0, step);
   }
 
+  function clearHoldTimer() {
+    if (drag?.timer) {
+      clearTimeout(drag.timer);
+      drag.timer = null;
+    }
+  }
+
+  function activateDrag() {
+    if (!drag || drag.activated) return;
+    clearHoldTimer();
+    drag.activated = true;
+    drag.dragging = true;
+    drag.handle?.classList.remove('hold-pending');
+    drag.handle?.classList.add('hold-active');
+    switchToManualUsingCurrentView();
+    drag.row?.classList.add('task-row-dragging');
+    document.body.classList.add('task-reordering');
+
+    if (drag.kind === 'pointer') {
+      try { drag.handle?.setPointerCapture(drag.pointerId); } catch {}
+    }
+  }
+
+  function beginHold(data) {
+    if (drag) finishDrag(false);
+    drag = {...data, activated:false, dragging:false, timer:null};
+    drag.handle?.classList.add('hold-pending');
+    drag.timer = setTimeout(activateDrag, HOLD_MS);
+  }
+
   function finishDrag(saveOrder) {
     if (!drag) return;
-    const moved = drag.dragging;
+    const shouldSave = !!(saveOrder && drag.activated);
+    clearHoldTimer();
+
+    drag.handle?.classList.remove('hold-pending', 'hold-active');
     drag.row?.classList.remove('task-row-dragging');
+    if (drag.kind === 'pointer') {
+      try { drag.handle?.releasePointerCapture(drag.pointerId); } catch {}
+    }
     drag = null;
     document.body.classList.remove('task-reordering');
 
-    if (moved && saveOrder) {
+    if (shouldSave) {
       reorderStateToDom();
       save();
       render();
     }
+  }
+
+  function movedTooFar(x, y) {
+    if (!drag) return false;
+    return Math.hypot(x - drag.startX, y - drag.startY) > MOVE_CANCEL_PX;
+  }
+
+  function touchById(list, id) {
+    return Array.from(list || []).find(t => t.identifier === id) || null;
   }
 
   function bindDragEvents() {
@@ -198,35 +257,78 @@
       }
     }, true);
 
+    body.addEventListener('contextmenu', e => {
+      if (e.target.closest('.task-drag-handle')) e.preventDefault();
+    });
+
+    body.addEventListener('touchstart', e => {
+      const handle = e.target.closest('.task-drag-handle');
+      if (!handle || !e.changedTouches.length) return;
+      const row = handle.closest('tr[data-id]');
+      if (!row) return;
+      const t = e.changedTouches[0];
+
+      beginHold({
+        kind:'touch',
+        touchId:t.identifier,
+        handle,
+        row,
+        startX:t.clientX,
+        startY:t.clientY
+      });
+    }, {passive:true});
+
+    window.addEventListener('touchmove', e => {
+      if (!drag || drag.kind !== 'touch') return;
+      const t = touchById(e.touches, drag.touchId);
+      if (!t) return;
+
+      if (!drag.activated) {
+        if (movedTooFar(t.clientX, t.clientY)) finishDrag(false);
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+      autoScroll(t.clientY);
+      moveRowAtPointer(t.clientY);
+    }, {passive:false});
+
+    window.addEventListener('touchend', e => {
+      if (!drag || drag.kind !== 'touch') return;
+      if (!touchById(e.changedTouches, drag.touchId)) return;
+      finishDrag(true);
+    }, {passive:true});
+
+    window.addEventListener('touchcancel', e => {
+      if (!drag || drag.kind !== 'touch') return;
+      if (!touchById(e.changedTouches, drag.touchId)) return;
+      finishDrag(false);
+    }, {passive:true});
+
     body.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'touch' || e.button !== 0) return;
       const handle = e.target.closest('.task-drag-handle');
       if (!handle) return;
       const row = handle.closest('tr[data-id]');
       if (!row) return;
 
-      e.preventDefault();
-      e.stopPropagation();
-      drag = {
-        pointerId: e.pointerId,
+      beginHold({
+        kind:'pointer',
+        pointerId:e.pointerId,
+        handle,
         row,
-        startX: e.clientX,
-        startY: e.clientY,
-        dragging: false
-      };
-      try { handle.setPointerCapture(e.pointerId); } catch {}
+        startX:e.clientX,
+        startY:e.clientY
+      });
     });
 
     window.addEventListener('pointermove', e => {
-      if (!drag || e.pointerId !== drag.pointerId) return;
-      const dx = e.clientX - drag.startX;
-      const dy = e.clientY - drag.startY;
-      if (!drag.dragging && Math.hypot(dx, dy) < 7) return;
+      if (!drag || drag.kind !== 'pointer' || e.pointerId !== drag.pointerId) return;
 
-      if (!drag.dragging) {
-        switchToManualUsingCurrentView();
-        drag.dragging = true;
-        drag.row.classList.add('task-row-dragging');
-        document.body.classList.add('task-reordering');
+      if (!drag.activated) {
+        if (movedTooFar(e.clientX, e.clientY)) finishDrag(false);
+        return;
       }
 
       e.preventDefault();
@@ -235,13 +337,13 @@
     }, {passive:false});
 
     window.addEventListener('pointerup', e => {
-      if (!drag || e.pointerId !== drag.pointerId) return;
+      if (!drag || drag.kind !== 'pointer' || e.pointerId !== drag.pointerId) return;
       finishDrag(true);
     });
 
     window.addEventListener('pointercancel', e => {
-      if (!drag || e.pointerId !== drag.pointerId) return;
-      finishDrag(true);
+      if (!drag || drag.kind !== 'pointer' || e.pointerId !== drag.pointerId) return;
+      finishDrag(false);
     });
   }
 
