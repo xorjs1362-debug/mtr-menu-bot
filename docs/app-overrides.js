@@ -1,5 +1,50 @@
 (() => {
   const LAST_DUE_KEY = 'todo:lastDue';
+  const DESKTOP_WIDTHS = [58,314,140,113,107,125,168,155];
+  const MOBILE_WIDTHS = [44,168,100,90,82,100,148,118];
+
+  function forceColumnLayout() {
+    const table = document.querySelector('.table-wrap table');
+    if (!table) return;
+
+    const mobile = window.matchMedia('(max-width:600px)').matches;
+    const widths = mobile ? MOBILE_WIDTHS : DESKTOP_WIDTHS;
+    const total = widths.reduce((a,b)=>a+b,0);
+
+    table.style.tableLayout = 'fixed';
+    table.style.width = total + 'px';
+    table.style.minWidth = total + 'px';
+    table.style.maxWidth = total + 'px';
+
+    let colgroup = table.querySelector('colgroup[data-layout="v14"]');
+    if (!colgroup) {
+      table.querySelectorAll('colgroup[data-layout]').forEach(x=>x.remove());
+      colgroup = document.createElement('colgroup');
+      colgroup.dataset.layout = 'v14';
+      widths.forEach(()=>colgroup.appendChild(document.createElement('col')));
+      table.insertBefore(colgroup, table.firstChild);
+    }
+
+    [...colgroup.children].forEach((col,i)=>{
+      col.style.width = widths[i] + 'px';
+      col.style.minWidth = widths[i] + 'px';
+      col.style.maxWidth = widths[i] + 'px';
+    });
+
+    table.querySelectorAll('tr').forEach(row=>{
+      [...row.children].forEach((cell,i)=>{
+        if (i >= widths.length) return;
+        const w = widths[i] + 'px';
+        cell.style.width = w;
+        cell.style.minWidth = w;
+        cell.style.maxWidth = w;
+      });
+    });
+
+    table.querySelectorAll('th:nth-child(2),td:nth-child(2)').forEach(cell=>{
+      cell.style.left = widths[0] + 'px';
+    });
+  }
 
   function normalizeStatuses() {
     let changed = false;
@@ -12,6 +57,12 @@
     });
     return changed;
   }
+
+  const originalRender = render;
+  render = function() {
+    originalRender();
+    forceColumnLayout();
+  };
 
   const originalEnter = enter;
   enter = async function() {
@@ -124,6 +175,8 @@
 
   applyStatusUI();
   restoreLastDue();
+  forceColumnLayout();
+  window.addEventListener('resize', forceColumnLayout);
 
   $('#addBtn').onclick = addTask;
   $('#newTitle').onkeydown = e => { if (e.key === 'Enter') addTask(); };
